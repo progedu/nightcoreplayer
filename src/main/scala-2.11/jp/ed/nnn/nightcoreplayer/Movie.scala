@@ -47,5 +47,4 @@ object Movie {
     movie.setMedia(media)
     movie
   }
-
 }
