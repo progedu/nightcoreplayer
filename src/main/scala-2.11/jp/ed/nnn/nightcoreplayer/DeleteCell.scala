@@ -10,7 +10,7 @@ import javafx.scene.media.MediaView
 class DeleteCell(movies: ObservableList[Movie], mediaView: MediaView, tableView: TableView[Movie]) extends TableCell[Movie, Long]() {
   val hBox = new HBox()
   hBox.setAlignment(Pos.CENTER)
-  val button = new Button("X")
+  val button = new Button("×")
   hBox.getChildren.addAll(button)
 
   override def updateItem(id: Long, empty: Boolean): Unit = {
