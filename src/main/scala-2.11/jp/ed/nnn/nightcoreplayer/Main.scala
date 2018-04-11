@@ -147,41 +147,8 @@ class Main extends Application {
     mediaView.fitWidthProperty().bind(scene.widthProperty().subtract(tableMinWidth))
     mediaView.fitHeightProperty().bind(scene.heightProperty().subtract(toolBarMinHeight))
 
-    scene.setOnDragOver(new EventHandler[DragEvent] {
-      override def handle(event: DragEvent): Unit = {
-        if (event.getGestureSource != scene &&
-          event.getDragboard.hasFiles) {
-          event.acceptTransferModes(TransferMode.COPY_OR_MOVE: _*)
-        }
-        event.consume()
-      }
-    })
-
-    scene.setOnDragDropped(new EventHandler[DragEvent] {
-      override def handle(event: DragEvent): Unit = {
-        val db = event.getDragboard
-        if (db.hasFiles) {
-          db.getFiles.toArray(Array[File]()).toSeq.foreach { f =>
-            val filePath = f.getAbsolutePath
-            val fileName = f.getName
-            val media = new Media(f.toURI.toString)
-            val player = new MediaPlayer(media)
-            player.setOnReady(new Runnable {
-              override def run(): Unit = {
-                val time = formatTime(media.getDuration)
-                val movie = Movie(System.currentTimeMillis(), fileName, time, filePath, media)
-                while (movies.contains(movie)) {
-                  movie.setId(movie.getId + 1L)
-                }
-                movies.add(movie)
-                player.dispose()
-              }
-            })
-          }
-        }
-        event.consume()
-      }
-    })
+    scene.setOnDragOver(new MovieFileDragOverEventHandler(scene))
+    scene.setOnDragDropped(new MovieFileDragDroppedEventHandler(movies))
 
     primaryStage.setTitle("mp4ファイルをドラッグ&ドロップしてください")
 
@@ -253,14 +220,4 @@ class Main extends Application {
     playMovie(movie, tableView, mediaView, timeLabel)
   }
 
-  private[this] def formatTime(elapsed: Duration): String = {
-    "%02d:%02d:%02d".format(
-      elapsed.toHours.toInt,
-      elapsed.toMinutes.toInt % 60,
-      elapsed.toSeconds.toInt % 60
-    )
-  }
-
-  private[this] def formatTime(elapsed: Duration, duration: Duration): String =
-    s"${formatTime(elapsed)}/${formatTime(duration)}"
 }
