@@ -1,21 +1,19 @@
 package jp.ed.nnn.nightcoreplayer
 
-import java.io.File
 import javafx.application.Application
-import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.collections.FXCollections
-import javafx.event.{ActionEvent, EventHandler}
-import javafx.geometry.Pos
+import javafx.event.EventHandler
 import javafx.scene.Scene
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.control._
-import javafx.scene.image.{Image, ImageView}
-import javafx.scene.input.{DragEvent, MouseEvent, TransferMode}
-import javafx.scene.layout.{BorderPane, HBox}
-import javafx.scene.media.{Media, MediaPlayer, MediaView}
+import javafx.scene.input.MouseEvent
+import javafx.scene.layout.BorderPane
+import javafx.scene.media.MediaView
 import javafx.scene.paint.Color
 import javafx.stage.Stage
-import javafx.util.{Callback, Duration}
+import javafx.util.Callback
+
+import jp.ed.nnn.nightcoreplayer.SizeConstants._
 
 object Main extends App {
   Application.launch(classOf[Main], args: _*)
@@ -23,22 +21,12 @@ object Main extends App {
 
 class Main extends Application {
 
-  private[this] val mediaViewFitWidth = 800
-  private[this] val mediaViewFitHeight = 450
-  private[this] val toolBarMinHeight = 50
-  private[this] val tableMinWidth = 300
-
   override def start(primaryStage: Stage): Unit = {
     val mediaView = new MediaView()
 
     val timeLabel = new Label()
     timeLabel.setText("00:00:00/00:00:00")
     timeLabel.setTextFill(Color.WHITE)
-
-    val toolBar = new HBox()
-    toolBar.setMinHeight(toolBarMinHeight)
-    toolBar.setAlignment(Pos.CENTER)
-    toolBar.setStyle("-fx-background-color: Black")
 
     val tableView = new TableView[Movie]()
     tableView.setMinWidth(tableMinWidth)
@@ -50,7 +38,7 @@ class Main extends Application {
         row.setOnMouseClicked(new EventHandler[MouseEvent] {
           override def handle(event: MouseEvent): Unit = {
             if (event.getClickCount >= 1 && !row.isEmpty) {
-              playMovie(row.getItem, tableView, mediaView, timeLabel)
+              MoviePlayer.play(row.getItem, tableView, mediaView, timeLabel)
             }
           }
         })
@@ -76,65 +64,7 @@ class Main extends Application {
 
     tableView.getColumns.setAll(fileNameColumn, timeColumn, deleteActionColumn)
 
-    // first button
-    val firstButton = createButton("first.png", new EventHandler[ActionEvent]() {
-      override def handle(event: ActionEvent): Unit =
-        if (mediaView.getMediaPlayer != null) {
-          playPre(tableView, mediaView, timeLabel)
-        }
-    })
-
-    // back button
-    val backButton = createButton("back.png", new EventHandler[ActionEvent]() {
-      override def handle(event: ActionEvent): Unit =
-        if (mediaView.getMediaPlayer != null) {
-          mediaView.getMediaPlayer.seek(
-            mediaView.getMediaPlayer.getCurrentTime.subtract(new Duration(10000)))
-        }
-    })
-
-    // play button
-    val playButton = createButton("play.png", new EventHandler[ActionEvent]() {
-      override def handle(event: ActionEvent): Unit = {
-        val selectionModel = tableView.getSelectionModel
-        if (mediaView.getMediaPlayer != null && !selectionModel.isEmpty) {
-          mediaView.getMediaPlayer.play()
-        }
-      }
-    })
-
-    // pause button
-    val pauseButton = createButton("pause.png", new EventHandler[ActionEvent]() {
-      override def handle(event: ActionEvent): Unit = {
-        if (mediaView.getMediaPlayer != null) mediaView.getMediaPlayer.pause()
-      }
-    })
-
-    // forward button
-    val forwardButton = createButton("forward.png", new EventHandler[ActionEvent]() {
-      override def handle(event: ActionEvent): Unit =
-        if (mediaView.getMediaPlayer != null) {
-          mediaView.getMediaPlayer.seek(
-            mediaView.getMediaPlayer.getCurrentTime.add(new Duration(10000)))
-        }
-    })
-
-    // last button
-    val lastButton = createButton("last.png", new EventHandler[ActionEvent]() {
-      override def handle(event: ActionEvent): Unit =
-        if (mediaView.getMediaPlayer != null) {
-          playNext(tableView, mediaView, timeLabel)
-        }
-    })
-
-    // fullscreen button
-    val fullscreenButton = createButton("fullscreen.png", new EventHandler[ActionEvent]() {
-      override def handle(event: ActionEvent): Unit =
-        primaryStage.setFullScreen(true)
-    })
-
-    toolBar.getChildren.addAll(
-      firstButton, backButton, playButton, pauseButton, forwardButton, lastButton, fullscreenButton, timeLabel)
+    val toolBar = ToolbarCreator.create(mediaView, tableView, timeLabel, primaryStage)
 
     val baseBorderPane = new BorderPane()
     baseBorderPane.setStyle("-fx-background-color: Black")
@@ -155,73 +85,5 @@ class Main extends Application {
     primaryStage.setScene(scene)
     primaryStage.show()
   }
-
-  private[this] def createButton(imagePath: String, eventHandler: EventHandler[ActionEvent]): Button = {
-    val buttonImage = new Image(getClass.getResourceAsStream(imagePath))
-    val button = new Button()
-    button.setGraphic(new ImageView(buttonImage))
-    button.setStyle("-fx-background-color: Black")
-    button.setOnAction(eventHandler)
-    button.addEventHandler(MouseEvent.MOUSE_ENTERED, new EventHandler[MouseEvent]() {
-      override def handle(event: MouseEvent): Unit = {
-        button.setStyle("-fx-body-color: Black")
-      }
-    })
-    button.addEventHandler(MouseEvent.MOUSE_EXITED, new EventHandler[MouseEvent]() {
-      override def handle(event: MouseEvent): Unit = {
-        button.setStyle("-fx-background-color: Black")
-      }
-    })
-    button
-  }
-
-  private[this] def playMovie(movie: Movie, tableView: TableView[Movie], mediaView: MediaView, timeLabel: Label): Unit = {
-    if (mediaView.getMediaPlayer != null) {
-      val oldPlayer = mediaView.getMediaPlayer
-      oldPlayer.stop()
-      oldPlayer.dispose()
-    }
-
-    val mediaPlayer = new MediaPlayer(movie.media)
-    mediaPlayer.currentTimeProperty().addListener(new ChangeListener[Duration] {
-      override def changed(observable: ObservableValue[_ <: Duration], oldValue: Duration, newValue: Duration): Unit =
-        timeLabel.setText(formatTime(mediaPlayer.getCurrentTime, mediaPlayer.getTotalDuration))
-    })
-    mediaPlayer.setOnReady(new Runnable {
-      override def run(): Unit =
-        timeLabel.setText(formatTime(mediaPlayer.getCurrentTime, mediaPlayer.getTotalDuration))
-    })
-    mediaPlayer.setOnEndOfMedia(new Runnable {
-      override def run(): Unit = playNext(tableView, mediaView, timeLabel)
-    })
-
-    mediaView.setMediaPlayer(mediaPlayer)
-    mediaPlayer.setRate(1.25)
-    mediaPlayer.play()
-  }
-
-  sealed trait Track
-  object Pre extends Track
-  object Next extends Track
-
-  private[this] def playAt(track: Track, tableView: TableView[Movie], mediaView: MediaView, timeLabel: Label): Unit = {
-    val selectionModel = tableView.getSelectionModel
-    if (selectionModel.isEmpty) return
-    val index = selectionModel.getSelectedIndex
-    val changedIndex = track match {
-      case Pre => (tableView.getItems.size() + index - 1) % tableView.getItems.size()
-      case Next => (index + 1) % tableView.getItems.size()
-    }
-    selectionModel.select(changedIndex)
-    val movie = selectionModel.getSelectedItem
-    playMovie(movie, tableView, mediaView, timeLabel)
-  }
-
-  private[this] def playPre(tableView: TableView[Movie], mediaView: MediaView, timeLabel: Label): Unit =
-    playAt(Pre, tableView, mediaView, timeLabel)
-
-  private[this] def playNext(tableView: TableView[Movie], mediaView: MediaView, timeLabel: Label): Unit =
-    playAt(Next, tableView, mediaView, timeLabel)
-
 
 }
