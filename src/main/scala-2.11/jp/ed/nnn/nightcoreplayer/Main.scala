@@ -46,7 +46,6 @@ class Main extends Application {
       }
     })
 
-
     val fileNameColumn = new TableColumn[Movie, String]("ファイル名")
     fileNameColumn.setCellValueFactory(new PropertyValueFactory("fileName"))
     fileNameColumn.setPrefWidth(160)
@@ -64,15 +63,15 @@ class Main extends Application {
 
     tableView.getColumns.setAll(fileNameColumn, timeColumn, deleteActionColumn)
 
-    val toolBar = ToolbarCreator.create(mediaView, tableView, timeLabel, primaryStage)
-
     val baseBorderPane = new BorderPane()
+    val scene = new Scene(baseBorderPane, mediaViewFitWidth + tableMinWidth, mediaViewFitHeight + toolBarMinHeight)
+    val toolBar = ToolbarCreator.create(mediaView, tableView, timeLabel, scene, primaryStage)
+
     baseBorderPane.setStyle("-fx-background-color: Black")
     baseBorderPane.setCenter(mediaView)
     baseBorderPane.setBottom(toolBar)
     baseBorderPane.setRight(tableView)
 
-    val scene = new Scene(baseBorderPane, mediaViewFitWidth + tableMinWidth, mediaViewFitHeight + toolBarMinHeight)
     scene.setFill(Color.BLACK)
     mediaView.fitWidthProperty().bind(scene.widthProperty().subtract(tableMinWidth))
     mediaView.fitHeightProperty().bind(scene.heightProperty().subtract(toolBarMinHeight))
