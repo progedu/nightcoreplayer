@@ -8,7 +8,7 @@ import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.cell.PropertyValueFactory
-import javafx.scene.control.{Label, TableColumn, TableRow, TableView}
+import javafx.scene.control.{Label, TableColumn, TableRow, TableView, TableCell}
 import javafx.scene.input.{DragEvent, MouseEvent, TransferMode}
 import javafx.scene.layout.{BorderPane, HBox}
 import javafx.scene.media.{Media, MediaPlayer, MediaView}
@@ -32,6 +32,7 @@ class Main extends Application {
     val timeLabel = new Label()
     timeLabel.setText("00:00:00/00:00:00")
     timeLabel.setTextFill(Color.WHITE)
+
     val toolBar = new HBox(timeLabel)
     toolBar.setMinHeight(toolBarMinHeight)
     toolBar.setAlignment(Pos.CENTER)
@@ -39,6 +40,7 @@ class Main extends Application {
 
     val tableView = new TableView[Movie]()
     tableView.setMinWidth(tableMinWidth)
+
     val movies = FXCollections.observableArrayList[Movie]()
     tableView.setItems(movies)
     tableView.setRowFactory(new Callback[TableView[Movie], TableRow[Movie]]() {
@@ -58,17 +60,27 @@ class Main extends Application {
     val fileNameColumn = new TableColumn[Movie, String]("ファイル名")
     fileNameColumn.setCellValueFactory(new PropertyValueFactory("fileName"))
     fileNameColumn.setPrefWidth(160)
+
     val timeColumn = new TableColumn[Movie, String]("時間")
     timeColumn.setCellValueFactory(new PropertyValueFactory("time"))
     timeColumn.setPrefWidth(80)
 
-    tableView.getColumns.setAll(fileNameColumn, timeColumn)
+    val deleteColumn = new TableColumn[Movie, Long]("削除")
+    deleteColumn.setCellValueFactory(new PropertyValueFactory("id"))
+    deleteColumn.setPrefWidth(60)
+    deleteColumn.setCellFactory(new Callback[TableColumn[Movie, Long], TableCell[Movie, Long]]() {
+      override def call(param: TableColumn[Movie, Long]): TableCell[Movie, Long] = {
+        new Delete(movies, mediaView, tableView)
+      }
+    })
+    tableView.getColumns.setAll(fileNameColumn, timeColumn, deleteColumn)
 
     val baseBorderPane = new BorderPane()
     baseBorderPane.setStyle("-fx-background-color: Black")
     baseBorderPane.setCenter(mediaView)
     baseBorderPane.setBottom(toolBar)
     baseBorderPane.setRight(tableView)
+
     val scene = new Scene(baseBorderPane, mediaViewFitWidth + tableMinWidth, mediaViewFitHeight + toolBarMinHeight)
     scene.setFill(Color.BLACK)
     mediaView.fitWidthProperty().bind(scene.widthProperty().subtract(tableMinWidth))
@@ -121,7 +133,6 @@ class Main extends Application {
       oldPlayer.stop()
       oldPlayer.dispose()
     }
-
     val mediaPlayer = new MediaPlayer(movie.media)
     mediaPlayer.currentTimeProperty().addListener(new ChangeListener[Duration] {
       override def changed(observable: ObservableValue[_ <: Duration], oldValue: Duration, newValue: Duration): Unit =
