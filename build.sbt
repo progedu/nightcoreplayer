@@ -1,4 +1,5 @@
 lazy val commonSettings = Seq(
+  name := "nightcoreplayer",
   version := "1.0.0-SNAPSHOT",
   organization := "jp.ed.nnn",
   scalaVersion := "2.12.7",
@@ -10,7 +11,7 @@ lazy val app = (project in file(".")).
   settings(
     mainClass in assembly := Some("jp.ed.nnn.nightcoreplayer.Main"),
     assemblyJarName in assembly := "nightcoreplayer.jar"
-  )
+)
 
 val osName: SettingKey[String] = SettingKey[String]("osName")
 
