@@ -74,15 +74,15 @@ class Main extends Application {
     fileNameColumn.setPrefWidth(160)
     val timeColumn = new TableColumn[Movie, String]("時間")
     timeColumn.setCellValueFactory(new PropertyValueFactory("time"))
+    timeColumn.setPrefWidth(80)
     val deleteActionColumn = new TableColumn[Movie, Long]("削除")
     deleteActionColumn.setCellValueFactory(new PropertyValueFactory("id"))
     deleteActionColumn.setPrefWidth(60)
     deleteActionColumn.setCellFactory(new Callback[TableColumn[Movie, Long], TableCell[Movie, Long]]() {
       override def call(param: TableColumn[Movie, Long]): TableCell[Movie, Long] = {
-        new DeleteCell(movies, mediaView, tableView)
+        new DeleteCell (movies, mediaView, tableView)
       }
     })
-    timeColumn.setPrefWidth(80)
 
     tableView.getColumns.setAll(fileNameColumn, timeColumn, deleteActionColumn)
 
