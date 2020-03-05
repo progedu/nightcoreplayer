@@ -9,7 +9,7 @@ import javafx.collections.FXCollections
 import javafx.event.EventHandler
 import javafx.scene.Scene
 import javafx.scene.control.cell.PropertyValueFactory
-import javafx.scene.control.{Label, SelectionModel, TableColumn, TableRow, TableView}
+import javafx.scene.control.{Label, TableCell, TableColumn, TableRow, TableView}
 import javafx.scene.input.{DragEvent, MouseEvent, TransferMode}
 import javafx.scene.layout.{BorderPane, HBox}
 import javafx.scene.media.{Media, MediaPlayer, MediaView}
@@ -74,9 +74,17 @@ class Main extends Application {
     fileNameColumn.setPrefWidth(160)
     val timeColumn = new TableColumn[Movie, String]("時間")
     timeColumn.setCellValueFactory(new PropertyValueFactory("time"))
+    val deleteActionColumn = new TableColumn[Movie, Long]("削除")
+    deleteActionColumn.setCellValueFactory(new PropertyValueFactory("id"))
+    deleteActionColumn.setPrefWidth(60)
+    deleteActionColumn.setCellFactory(new Callback[TableColumn[Movie, Long], TableCell[Movie, Long]]() {
+      override def call(param: TableColumn[Movie, Long]): TableCell[Movie, Long] = {
+        new DeleteCell(movies, mediaView, tableView)
+      }
+    })
     timeColumn.setPrefWidth(80)
 
-    tableView.getColumns.setAll(fileNameColumn, timeColumn)
+    tableView.getColumns.setAll(fileNameColumn, timeColumn, deleteActionColumn)
 
     //movies.addAll(Movie(1L, "D0002040283_00000_V_000.mp4", "00:00:00", "./D0002040283_00000_V_000.mp4", null))
 
