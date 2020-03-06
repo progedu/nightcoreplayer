@@ -1,18 +1,16 @@
 package jp.ed.nnn.nightcoreplayer
 
 import javafx.application.Application
+import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.collections.FXCollections
-import javafx.event.EventHandler
 import javafx.scene.Scene
 import javafx.scene.control.cell.PropertyValueFactory
-import javafx.scene.control.{Label, TableCell, TableColumn, TableRow, TableView}
+import javafx.scene.control.{Label, TableColumn, TableRow, TableView}
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.BorderPane
 import javafx.scene.media.MediaView
 import javafx.scene.paint.Color
 import javafx.stage.Stage
-import javafx.util.Callback
-
 import jp.ed.nnn.nightcoreplayer.SizeConstants._
 
 object Main extends App {
@@ -77,6 +75,18 @@ class Main extends Application {
     scene.setOnDragOver(new MovieFileDragOverEventHandler(scene))
     scene.setOnDragDropped(new MovieFileDragDroppedEventHandler(movies))
 
+    primaryStage.fullScreenProperty().addListener(new ChangeListener[java.lang.Boolean] {
+      override def changed(observableValue: ObservableValue[_ <: java.lang.Boolean],
+                           t: java.lang.Boolean, t1: java.lang.Boolean): Unit = {
+        if (t1) {
+          mediaView.fitWidthProperty().bind(scene.widthProperty())
+          mediaView.fitHeightProperty().bind(scene.heightProperty())
+        } else {
+          mediaView.fitWidthProperty().bind(scene.widthProperty().subtract(tableMinWidth))
+          mediaView.fitHeightProperty().bind(scene.heightProperty().subtract(toolBarMinHeight))
+        }
+      }
+    })
     primaryStage.setTitle("mp4ファイルをドラッグ＆ドロップしてください")
     primaryStage.setScene(scene)
     primaryStage.show()
