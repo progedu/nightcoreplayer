@@ -7,7 +7,8 @@ import javafx.scene.control.{Button, TableCell, TableView}
 import javafx.scene.layout.HBox
 import javafx.scene.media.MediaView
 
-class DeleteCell(movies: ObservableList[Movie], mediaView: MediaView, tableView: TableView[Movie]) extends TableCell[Movie, Long]() {
+class DeleteCell(movies: ObservableList[Movie], mediaView: MediaView,
+                 tableView: TableView[Movie]) extends TableCell[Movie, Long]() {
   val hBox = new HBox()
   hBox.setAlignment(Pos.CENTER)
   val button = new Button("X")
@@ -20,10 +21,15 @@ class DeleteCell(movies: ObservableList[Movie], mediaView: MediaView, tableView:
     } else {
       button.setOnAction(new EventHandler[ActionEvent] {
         override def handle(event: ActionEvent): Unit = {
+          //println("movies=" + movies.size())
           val deleted = movies.toArray(Array[Movie]()).toSeq.find(m => m.id == id)
+          /*deleted.foreach(m => {
+            println("deleted=" + m.id + " " + m.fileName)
+          })*/
           if (tableView.getSelectionModel.getSelectedItem != null
-            && tableView.getSelectionModel.getSelectedItem.id == id) {
+              && tableView.getSelectionModel.getSelectedItem.id == id) {
             mediaView.getMediaPlayer.stop()
+            //println("Player stop for delete")
           }
           deleted.map(m => movies.removeAll(m))
         }
@@ -32,5 +38,4 @@ class DeleteCell(movies: ObservableList[Movie], mediaView: MediaView, tableView:
     }
     setText(null)
   }
-
 }

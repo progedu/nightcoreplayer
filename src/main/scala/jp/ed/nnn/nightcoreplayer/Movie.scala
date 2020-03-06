@@ -1,7 +1,6 @@
 package jp.ed.nnn.nightcoreplayer
 
 import javafx.scene.media.Media
-
 import scala.beans.BeanProperty
 
 class Movie {
@@ -25,8 +24,7 @@ class Movie {
 
   override def equals(other: Any): Boolean = other match {
     case that: Movie =>
-      (that canEqual this) &&
-        id == that.id
+      (that canEqual this) && id == that.id
     case _ => false
   }
 
@@ -47,5 +45,4 @@ object Movie {
     movie.setMedia(media)
     movie
   }
-
 }
