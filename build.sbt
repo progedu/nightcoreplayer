@@ -1,5 +1,6 @@
 lazy val commonSettings = Seq(
-  version := "1.0.0-SNAPSHOT",
+  name := "nightcoreplayer",
+  version := "1.0.0",
   organization := "jp.ed.nnn",
   scalaVersion := "2.12.7",
   test in assembly := {}
@@ -31,4 +32,8 @@ libraryDependencies += "org.openjfx" % "javafx-media" % "11-ea+25" classifier os
 assemblyMergeStrategy in assembly := {
   case PathList("module-info.class") => MergeStrategy.first
   case x => (assemblyMergeStrategy in assembly).value(x)
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> webapp-curriculum-1017
