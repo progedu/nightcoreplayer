@@ -6,10 +6,11 @@ import javafx.application.Application
 import javafx.geometry.Pos
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.collections.FXCollections
-import javafx.event.EventHandler
+import javafx.event.{ActionEvent, EventHandler}
 import javafx.scene.Scene
 import javafx.scene.control.cell.PropertyValueFactory
-import javafx.scene.control.{Label, TableCell, TableColumn, TableRow, TableView}
+import javafx.scene.control.{Button, Label, TableCell, TableColumn, TableRow, TableView}
+import javafx.scene.image.{Image, ImageView}
 import javafx.scene.input.{DragEvent, MouseEvent, TransferMode}
 import javafx.scene.layout.{BorderPane, HBox}
 import javafx.scene.media.{Media, MediaPlayer, MediaView}
@@ -46,7 +47,8 @@ class Main extends Application {
     timeLabel.setText("00:00:00.000/00:00:00.000")
     timeLabel.setTextFill(Color.WHITE)
 
-    val toolBar = new HBox(timeLabel)
+    //val toolBar = new HBox(timeLabel)
+    val toolBar = new HBox()
     toolBar.setMinHeight(toolBarMinHeight)
     toolBar.setAlignment(Pos.CENTER)
     toolBar.setStyle("-fx-background-color: Black")
@@ -85,6 +87,60 @@ class Main extends Application {
     })
 
     tableView.getColumns.setAll(fileNameColumn, timeColumn, deleteActionColumn)
+
+    // play button
+    val playButtonImage = new Image(getClass.getResourceAsStream("play.png"))
+    val playButton = new Button()
+    playButton.setGraphic(new ImageView(playButtonImage))
+    playButton.setStyle("-fx-background-color: Black")
+    playButton.setOnAction(new EventHandler[ActionEvent]() {
+      override def handle(event: ActionEvent): Unit = {
+        val selectionModel = tableView.getSelectionModel
+        if (mediaView.getMediaPlayer != null && !selectionModel.isEmpty) {
+          mediaView.getMediaPlayer.play()
+        }
+      }
+    })
+    playButton.addEventHandler(MouseEvent.MOUSE_ENTERED, new EventHandler[MouseEvent]() {
+      override def handle(event: MouseEvent): Unit = {
+        playButton.setStyle("-fx-body-color: Black")
+      }
+    })
+    playButton.addEventHandler(MouseEvent.MOUSE_EXITED, new EventHandler[MouseEvent]() {
+      override def handle(event: MouseEvent): Unit = {
+        playButton.setStyle("-fx-background-color: Black")
+      }
+    })
+
+    // pause button
+    val pauseButtonImage = new Image(getClass.getResourceAsStream("pause.png"))
+    val pauseButton = new Button()
+    pauseButton.setGraphic(new ImageView(pauseButtonImage))
+    pauseButton.setStyle("-fx-background-color: Black")
+    pauseButton.setOnAction(new EventHandler[ActionEvent]() {
+      override def handle(event: ActionEvent): Unit = {
+        if (mediaView.getMediaPlayer != null) {
+          if (mediaView.getMediaPlayer.getStatus == MediaPlayer.Status.PLAYING) {
+            mediaView.getMediaPlayer.pause()
+          } else {
+            val selectionModel = tableView.getSelectionModel
+            if (!selectionModel.isEmpty) mediaView.getMediaPlayer.play()
+          }
+        }
+      }
+    })
+    pauseButton.addEventHandler(MouseEvent.MOUSE_ENTERED, new EventHandler[MouseEvent]() {
+      override def handle(event: MouseEvent): Unit = {
+        pauseButton.setStyle("-fx-body-color: Black")
+      }
+    })
+    pauseButton.addEventHandler(MouseEvent.MOUSE_EXITED, new EventHandler[MouseEvent]() {
+      override def handle(event: MouseEvent): Unit = {
+        pauseButton.setStyle("-fx-background-color: Black")
+      }
+    })
+
+    toolBar.getChildren.addAll(playButton, pauseButton, timeLabel)
 
     //movies.addAll(Movie(1L, "D0002040283_00000_V_000.mp4", "00:00:00", "./D0002040283_00000_V_000.mp4", null))
 
