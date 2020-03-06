@@ -48,9 +48,14 @@ object ToolbarCreator {
 
     // forward button
     val forwardButton = ButtonCreator.create("forward.png", (t: ActionEvent) =>
-      if (mediaView.getMediaPlayer != null)
-        mediaView.getMediaPlayer.seek(
-          mediaView.getMediaPlayer.getCurrentTime.add(new Duration(10000))))
+      if (mediaView.getMediaPlayer != null) {
+        val forwardTime = mediaView.getMediaPlayer.getCurrentTime.add(new Duration(10000))
+        if (forwardTime.compareTo(mediaView.getMediaPlayer.getTotalDuration) < 0) {
+          mediaView.getMediaPlayer.seek(forwardTime)
+        } else {
+          MoviePlayer.playNext(tableView, mediaView, timeLabel)
+        }
+      })
 
     // last button
     val lastButton = ButtonCreator.create("last.png", (t: ActionEvent) =>

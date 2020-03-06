@@ -33,18 +33,14 @@ class Main extends Application {
     tableView.setMinWidth(tableMinWidth)
     val movies = FXCollections.observableArrayList[Movie]()
     tableView.setItems(movies)
-    tableView.setRowFactory(new Callback[TableView[Movie], TableRow[Movie]]() {
-      override def call(param: TableView[Movie]): TableRow[Movie] = {
-        val row = new TableRow[Movie]()
-        row.setOnMouseClicked(new EventHandler[MouseEvent] {
-          override def handle(event: MouseEvent): Unit = {
-            if (event.getClickCount >= 1 && !row.isEmpty) {
-              MoviePlayer.play(row.getItem, tableView, mediaView, timeLabel)
-            }
-          }
-        })
-        row
-      }
+    tableView.setRowFactory((param: TableView[Movie]) => {
+      val row = new TableRow[Movie]()
+      row.setOnMouseClicked((event: MouseEvent) => {
+        if (event.getClickCount >= 1 && !row.isEmpty) {
+          MoviePlayer.play(row.getItem, tableView, mediaView, timeLabel)
+        }
+      })
+      row
     })
 
     val fileNameColumn = new TableColumn[Movie, String]("ファイル名")
@@ -56,10 +52,8 @@ class Main extends Application {
     val deleteActionColumn = new TableColumn[Movie, Long]("削除")
     deleteActionColumn.setCellValueFactory(new PropertyValueFactory("id"))
     deleteActionColumn.setPrefWidth(60)
-    deleteActionColumn.setCellFactory(new Callback[TableColumn[Movie, Long], TableCell[Movie, Long]]() {
-      override def call(param: TableColumn[Movie, Long]): TableCell[Movie, Long] = {
-        new DeleteCell(movies, mediaView, tableView)
-      }
+    deleteActionColumn.setCellFactory((param: TableColumn[Movie, Long]) => {
+      new DeleteCell(movies, mediaView, tableView)
     })
 
     tableView.getColumns.setAll(fileNameColumn, timeColumn, deleteActionColumn)
