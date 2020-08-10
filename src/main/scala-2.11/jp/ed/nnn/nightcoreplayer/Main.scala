@@ -18,7 +18,7 @@ import jp.ed.nnn.nightcoreplayer.SizeConstants._
 object Main extends App {
   Application.launch(classOf[Main], args: _*)
 }
-
+//調整
 class Main extends Application {
 
   override def start(primaryStage: Stage): Unit = {
