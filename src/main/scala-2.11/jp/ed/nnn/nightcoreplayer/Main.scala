@@ -30,6 +30,7 @@ class Main extends Application {
 
     val tableView = new TableView[Movie]()
     tableView.setMinWidth(tableMinWidth)
+
     val movies = FXCollections.observableArrayList[Movie]()
     tableView.setItems(movies)
     tableView.setRowFactory(new Callback[TableView[Movie], TableRow[Movie]]() {
@@ -49,9 +50,11 @@ class Main extends Application {
     val fileNameColumn = new TableColumn[Movie, String]("ファイル名")
     fileNameColumn.setCellValueFactory(new PropertyValueFactory("fileName"))
     fileNameColumn.setPrefWidth(160)
+
     val timeColumn = new TableColumn[Movie, String]("時間")
     timeColumn.setCellValueFactory(new PropertyValueFactory("time"))
     timeColumn.setPrefWidth(80)
+
     val deleteActionColumn = new TableColumn[Movie, Long]("削除")
     deleteActionColumn.setCellValueFactory(new PropertyValueFactory("id"))
     deleteActionColumn.setPrefWidth(60)
@@ -64,8 +67,8 @@ class Main extends Application {
     tableView.getColumns.setAll(fileNameColumn, timeColumn, deleteActionColumn)
 
     val baseBorderPane = new BorderPane()
-    val scene = new Scene(baseBorderPane, mediaViewFitWidth + tableMinWidth, mediaViewFitHeight + toolBarMinHeight)
-    val toolBar = ToolbarCreator.create(mediaView, tableView, timeLabel, scene, primaryStage)
+    val scene          = new Scene(baseBorderPane, mediaViewFitWidth + tableMinWidth, mediaViewFitHeight + toolBarMinHeight)
+    val toolBar        = ToolbarCreator.create(mediaView, tableView, timeLabel, scene, primaryStage)
 
     baseBorderPane.setStyle("-fx-background-color: Black")
     baseBorderPane.setCenter(mediaView)
