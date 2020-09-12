@@ -17,36 +17,48 @@ object Main extends App {
 }
 
 class Main extends Application {
+  private[this] val MediaViewFitWidth = 800
+  private[this] val MediaViewFitHeight = 450
+  private[this] val ToolBarMinHeight = 50
 
   override def start(primaryStage: Stage): Unit = {
-    val path = "downloads/video.mp4"
+    val path = "downloads/video.mp4"  
     val media = new Media(new File(path).toURI.toString)
     val mediaPlayer = new MediaPlayer(media)
+
     mediaPlayer.setRate(1.25)
     mediaPlayer.play()
-    val mediaView = new MediaView(mediaPlayer)
-    mediaView.setFitWidth(800)
-    mediaView.setFitHeight(450)
 
+    val mediaView = new MediaView(mediaPlayer)
     val timeLabel = new Label()
+
     mediaPlayer.currentTimeProperty().addListener(new ChangeListener[Duration] {
       override def changed(observable: ObservableValue[_ <: Duration], oldValue: Duration, newValue: Duration): Unit =
         timeLabel.setText(formatTime(mediaPlayer.getCurrentTime, mediaPlayer.getTotalDuration))
     })
+
     mediaPlayer.setOnReady(new Runnable {
       override def run(): Unit =
         timeLabel.setText(formatTime(mediaPlayer.getCurrentTime, mediaPlayer.getTotalDuration))
     })
+
     timeLabel.setText("00:00:00/00:00:00")
     timeLabel.setTextFill(Color.WHITE)
+
     val toolBar = new HBox(timeLabel)
+
+    toolBar.setMinHeight(ToolBarMinHeight)
     toolBar.setAlignment(Pos.CENTER)
     toolBar.setStyle("-fx-background-color: Black")
+
     val baseBorderPane = new BorderPane()
+
     baseBorderPane.setStyle("-fx-background-color: Black")
     baseBorderPane.setCenter(mediaView)
     baseBorderPane.setBottom(toolBar)
-    val scene = new Scene(baseBorderPane, 800, 500)
+
+    val scene = new Scene(baseBorderPane, MediaViewFitWidth, MediaViewFitHeight + ToolBarMinHeight)
+
     scene.setFill(Color.BLACK)
     primaryStage.setScene(scene)
     primaryStage.show()
