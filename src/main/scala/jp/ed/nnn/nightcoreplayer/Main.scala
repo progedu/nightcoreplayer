@@ -19,7 +19,7 @@ object Main extends App {
 class Main extends Application {
 
   override def start(primaryStage: Stage): Unit = {
-    val path = "/Users/soichiro_yoshimura/vagrant/ubuntu64/workspace/youtube_download/video.mp4"
+    val path = "downloads/video.mp4"
     val media = new Media(new File(path).toURI.toString)
     val mediaPlayer = new MediaPlayer(media)
     mediaPlayer.setRate(1.25)
