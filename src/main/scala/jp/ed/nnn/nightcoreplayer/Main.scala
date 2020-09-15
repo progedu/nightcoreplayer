@@ -22,7 +22,7 @@ class Main extends Application {
   private[this] val ToolBarMinHeight = 50
 
   override def start(primaryStage: Stage): Unit = {
-    val path = "downloads/video.mp4"  
+    val path = "downloads/video.mp4"
     val media = new Media(new File(path).toURI.toString)
     val mediaPlayer = new MediaPlayer(media)
 
@@ -60,6 +60,9 @@ class Main extends Application {
     val scene = new Scene(baseBorderPane, MediaViewFitWidth, MediaViewFitHeight + ToolBarMinHeight)
 
     scene.setFill(Color.BLACK)
+    mediaView.fitWidthProperty().bind(scene.widthProperty())
+    mediaView.fitHeightProperty().bind(scene.heightProperty().subtract(ToolBarMinHeight))
+
     primaryStage.setScene(scene)
     primaryStage.show()
   }
