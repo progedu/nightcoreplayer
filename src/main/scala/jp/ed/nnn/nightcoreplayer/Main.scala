@@ -41,13 +41,12 @@ class Main extends Application {
     tableView.setMinWidth(tableMinWidth)
     val movies = FXCollections.observableArrayList[Movie]()
     tableView.setItems(movies)
-    tableView.getSelectionModel
     tableView.setRowFactory(new Callback[TableView[Movie], TableRow[Movie]]() {
       override def call(param: TableView[Movie]): TableRow[Movie] = {
         val row = new TableRow[Movie]()
         row.setOnMouseClicked((event: MouseEvent) => {
           if (event.getClickCount >= 1 && !row.isEmpty) {
-            playMovie(row.getItem, mediaView, timeLabel, tableView.getItems)
+            playMovie(row.getItem, tableView, mediaView, timeLabel)
           }
         })
         row
@@ -118,9 +117,9 @@ class Main extends Application {
 
   private[this] def playMovie(
       movie: Movie,
+      tableView: TableView[Movie],
       mediaView: MediaView,
-      timeLabel: Label,
-      movieList: ObservableList[Movie]
+      timeLabel: Label
   ): Unit = {
     if (mediaView.getMediaPlayer != null) {
       val oldPlayer = mediaView.getMediaPlayer
@@ -151,17 +150,7 @@ class Main extends Application {
     mediaView.setMediaPlayer(mediaPlayer)
     mediaPlayer.setRate(1.25)
     mediaPlayer.setOnEndOfMedia(() => {
-      val incrementIndex: Int = movieList.indexOf(movie) + 1
-      if (movieList.size() - 1 >= incrementIndex) {
-        playMovie(
-          movieList.get(incrementIndex),
-          mediaView,
-          timeLabel,
-          movieList
-        )
-      } else {
-        playMovie(movieList.get(0), mediaView, timeLabel, movieList)
-      }
+      playNext(tableView, mediaView, timeLabel)
     })
     mediaPlayer.play()
   }
@@ -181,6 +170,20 @@ class Main extends Application {
       duration: Duration
   ): String = {
     s"${formatTime(elapsed)}/${formatTime(duration)}"
+  }
+
+  private[this] def playNext(
+      tableView: TableView[Movie],
+      mediaView: MediaView,
+      timeLabel: Label
+  ): Unit = {
+    val selectionModel = tableView.getSelectionModel
+    if (selectionModel.isEmpty) return
+    val index = selectionModel.getSelectedIndex
+    val nextIndex = (index + 1) % tableView.getItems.size()
+    selectionModel.select(nextIndex)
+    val movie = selectionModel.getSelectedItem
+    playMovie(movie, tableView, mediaView, timeLabel)
   }
 
 }
