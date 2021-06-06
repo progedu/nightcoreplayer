@@ -3,11 +3,12 @@ package jp.ed.nnn.nightcoreplayer
 import java.io.File
 import javafx.application.Application
 import javafx.beans.value.{ChangeListener, ObservableValue}
-import javafx.collections.{FXCollections, ObservableList}
+import javafx.collections.{FXCollections}
+import javafx.event.ActionEvent
 import javafx.geometry.Pos
 import javafx.scene.Scene
-import javafx.scene.control.cell.PropertyValueFactory
-import javafx.scene.control.{Label, TableColumn, TableRow, TableView}
+import javafx.scene.control.cell.{PropertyValueFactory}
+import javafx.scene.control._
 import javafx.scene.input.{DragEvent, MouseEvent, TransferMode}
 import javafx.scene.layout.{BorderPane, HBox}
 import javafx.scene.media.{Media, MediaPlayer, MediaView}
@@ -59,9 +60,20 @@ class Main extends Application {
     val timeColumn = new TableColumn[Movie, String]("時間")
     timeColumn.setCellValueFactory(new PropertyValueFactory("time"))
     timeColumn.setPrefWidth(80)
+    val deleteColumn = new TableColumn[Movie, Long]("削除")
+    deleteColumn.setCellValueFactory(new PropertyValueFactory("id"))
+    deleteColumn.setPrefWidth(60)
+    deleteColumn.setCellFactory(
+      new Callback[TableColumn[Movie, Long], TableCell[Movie, Long]]() {
+        override def call(
+            param: TableColumn[Movie, Long]
+        ): TableCell[Movie, Long] = {
+          new DeleteCell(movies, mediaView, tableView)
+        }
+      }
+    )
 
-    tableView.getColumns.setAll(fileNameColumn, timeColumn)
-
+    tableView.getColumns.setAll(fileNameColumn, timeColumn, deleteColumn)
     val baseBorderPane = new BorderPane()
     baseBorderPane.setStyle("-fx-background-color: Black")
     baseBorderPane.setCenter(mediaView)
