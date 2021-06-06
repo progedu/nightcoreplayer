@@ -3,8 +3,7 @@ package jp.ed.nnn.nightcoreplayer
 import java.io.File
 import javafx.application.Application
 import javafx.beans.value.{ChangeListener, ObservableValue}
-import javafx.collections.FXCollections
-import javafx.event.EventHandler
+import javafx.collections.{FXCollections, ObservableList}
 import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.cell.PropertyValueFactory
@@ -42,12 +41,13 @@ class Main extends Application {
     tableView.setMinWidth(tableMinWidth)
     val movies = FXCollections.observableArrayList[Movie]()
     tableView.setItems(movies)
+    tableView.getSelectionModel
     tableView.setRowFactory(new Callback[TableView[Movie], TableRow[Movie]]() {
       override def call(param: TableView[Movie]): TableRow[Movie] = {
         val row = new TableRow[Movie]()
         row.setOnMouseClicked((event: MouseEvent) => {
           if (event.getClickCount >= 1 && !row.isEmpty) {
-            playMovie(row.getItem, mediaView, timeLabel)
+            playMovie(row.getItem, mediaView, timeLabel, tableView.getItems)
           }
         })
         row
@@ -119,7 +119,8 @@ class Main extends Application {
   private[this] def playMovie(
       movie: Movie,
       mediaView: MediaView,
-      timeLabel: Label
+      timeLabel: Label,
+      movieList: ObservableList[Movie]
   ): Unit = {
     if (mediaView.getMediaPlayer != null) {
       val oldPlayer = mediaView.getMediaPlayer
@@ -149,6 +150,19 @@ class Main extends Application {
 
     mediaView.setMediaPlayer(mediaPlayer)
     mediaPlayer.setRate(1.25)
+    mediaPlayer.setOnEndOfMedia(() => {
+      val incrementIndex: Int = movieList.indexOf(movie) + 1
+      if (movieList.size() - 1 >= incrementIndex) {
+        playMovie(
+          movieList.get(incrementIndex),
+          mediaView,
+          timeLabel,
+          movieList
+        )
+      } else {
+        playMovie(movieList.get(0), mediaView, timeLabel, movieList)
+      }
+    })
     mediaPlayer.play()
   }
 
