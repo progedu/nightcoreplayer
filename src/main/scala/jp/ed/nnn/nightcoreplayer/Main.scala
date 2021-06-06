@@ -94,18 +94,22 @@ class Main extends Application {
             val filePath = f.getAbsolutePath
             val fileName = f.getName
             val media = new Media(f.toURI.toString)
-            val time = formatTime(media.getDuration)
-            val movie = Movie(
-              System.currentTimeMillis(),
-              fileName,
-              time,
-              filePath,
-              media
-            )
-            while (movies.contains(movie)) {
-              movie.setId(movie.getId + 1L)
-            }
-            movies.add(movie)
+            val player = new MediaPlayer(media)
+            player.setOnReady(() => {
+              val time = formatTime(media.getDuration)
+              val movie = Movie(
+                System.currentTimeMillis(),
+                fileName,
+                time,
+                filePath,
+                media
+              )
+              while (movies.contains(movie)) {
+                movie.setId(movie.getId + 1L)
+              }
+              movies.add(movie)
+              player.dispose()
+            })
         }
       }
       event.consume()
