@@ -64,9 +64,14 @@ object ToolbarCreator {
       "forward.png",
       (_: ActionEvent) => {
         if (mediaView.getMediaPlayer != null) {
-          mediaView.getMediaPlayer.seek(
+          val forwardTime = {
             mediaView.getMediaPlayer.getCurrentTime.add(new Duration(10000))
-          )
+          }
+          if (
+            mediaView.getMediaPlayer.getTotalDuration.greaterThan(forwardTime)
+          ) {
+            mediaView.getMediaPlayer.seek(forwardTime)
+          }
         }
       }
     )
