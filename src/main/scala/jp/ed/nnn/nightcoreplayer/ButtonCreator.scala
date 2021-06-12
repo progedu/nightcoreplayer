@@ -1,3 +1,33 @@
 package jp.ed.nnn.nightcoreplayer
 
-object ButtonCreator {}
+import javafx.event.{ActionEvent, EventHandler}
+import javafx.scene.control.Button
+import javafx.scene.image.{Image, ImageView}
+import javafx.scene.input.MouseEvent
+import jp.ed.nnn.nightcoreplayer.ToolbarCreator.getClass
+
+object ButtonCreator {
+  def createButton(
+      imagePath: String,
+      eventHandler: EventHandler[ActionEvent]
+  ): Button = {
+    val buttonImage = new Image(getClass.getResourceAsStream(imagePath))
+    val button = new Button()
+    button.setGraphic(new ImageView(buttonImage))
+    button.setStyle("-fx-background-color:Black")
+    button.setOnAction(eventHandler)
+    button.addEventHandler(
+      MouseEvent.MOUSE_ENTERED,
+      (_: MouseEvent) => {
+        button.setStyle("-fx-body-color: Black")
+      }
+    )
+    button.addEventHandler(
+      MouseEvent.MOUSE_EXITED,
+      (_: MouseEvent) => {
+        button.setStyle("-fx-background-color: Black")
+      }
+    )
+    button
+  }
+}
