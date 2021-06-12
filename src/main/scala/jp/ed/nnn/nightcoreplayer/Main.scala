@@ -22,6 +22,8 @@ import jp.ed.nnn.nightcoreplayer.SizeConstants.{
   toolBarMinHeight
 }
 
+import java.lang
+
 object Main extends App {
   Application.launch(classOf[Main], args: _*)
 }
@@ -72,20 +74,24 @@ class Main extends Application {
 
     tableView.getColumns.setAll(fileNameColumn, timeColumn, deleteActionColumn)
 
-    val toolBar =
-      ToolbarCreator.create(mediaView, tableView, timeLabel, primaryStage)
-
     val baseBorderPane = new BorderPane()
-    baseBorderPane.setStyle("-fx-background-color: Black")
-    baseBorderPane.setCenter(mediaView)
-    baseBorderPane.setBottom(toolBar)
-    baseBorderPane.setRight(tableView)
-
     val scene = new Scene(
       baseBorderPane,
       mediaViewFitWidth + tableMinWidth,
       mediaViewFitHeight + toolBarMinHeight
     )
+    val toolBar = ToolbarCreator.create(
+      mediaView,
+      tableView,
+      timeLabel,
+      scene,
+      primaryStage
+    )
+    baseBorderPane.setStyle("-fx-background-color: Black")
+    baseBorderPane.setCenter(mediaView)
+    baseBorderPane.setBottom(toolBar)
+    baseBorderPane.setRight(tableView)
+
     scene.setFill(Color.BLACK)
     mediaView
       .fitWidthProperty()

@@ -1,7 +1,9 @@
 package jp.ed.nnn.nightcoreplayer
 
+import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.event.{ActionEvent, EventHandler}
 import javafx.geometry.Pos
+import javafx.scene.Scene
 import javafx.scene.control.{Button, Label, TableView}
 import javafx.scene.image.{Image, ImageView}
 import javafx.scene.input.MouseEvent
@@ -13,11 +15,14 @@ import jp.ed.nnn.nightcoreplayer.ButtonCreator.createButton
 import jp.ed.nnn.nightcoreplayer.MoviePlayer.{playNext, playPre}
 import jp.ed.nnn.nightcoreplayer.SizeConstants._
 
+import java.lang
+
 object ToolbarCreator {
   def create(
       mediaView: MediaView,
       tableView: TableView[Movie],
       timeLabel: Label,
+      scene: Scene,
       primaryStage: Stage
   ): HBox = {
     val toolBar = new HBox()
@@ -87,8 +92,32 @@ object ToolbarCreator {
       "fullscreen.png",
       (_: ActionEvent) => {
         primaryStage.setFullScreen(true)
+        mediaView.fitHeightProperty().unbind()
+        mediaView.fitHeightProperty().bind(scene.heightProperty())
+        mediaView.fitWidthProperty().unbind()
+        mediaView.fitWidthProperty().bind(scene.widthProperty())
       }
     )
+    primaryStage
+      .fullScreenProperty()
+      .addListener(new ChangeListener[java.lang.Boolean] {
+        override def changed(
+            observableValue: ObservableValue[_ <: lang.Boolean],
+            oldValue: lang.Boolean,
+            newValue: lang.Boolean
+        ): Unit = {
+          if (!newValue) {
+            mediaView.fitHeightProperty().unbind()
+            mediaView.fitWidthProperty().unbind()
+            mediaView
+              .fitHeightProperty()
+              .bind(scene.heightProperty().subtract(toolBarMinHeight))
+            mediaView
+              .fitWidthProperty()
+              .bind(scene.widthProperty().subtract(tableMinWidth))
+          }
+        }
+      })
     toolBar.getChildren.addAll(
       firstButton,
       backButton,
