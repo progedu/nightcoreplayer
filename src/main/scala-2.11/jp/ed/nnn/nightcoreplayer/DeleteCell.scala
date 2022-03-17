@@ -30,6 +30,7 @@ class DeleteCell(movies: ObservableList[Movie], mediaView: MediaView, tableView:
       })
       setGraphic(hBox)
     }
+    
     setText(null)
   }
 
